@@ -1,32 +1,49 @@
-// ১. AOS Init
-AOS.init({ duration: 1000, once: true });
+// ১. AOS (Animate On Scroll) ইনিশিয়েলাইজেশন
+AOS.init({ 
+    duration: 1000, 
+    once: false, // স্ক্রল করলে বারবার অ্যানিমেশন হবে
+    mirror: true 
+});
 
-// ২. টাইমার ফাংশন (২৪ ঘণ্টার টাইমার)
-function startTimer(duration, display) {
-    let timer = duration, days, hours, minutes, seconds;
-    setInterval(function () {
-        days = 0;
-        hours = parseInt(timer / 3600, 10);
+// ২. Navbar Scroll Effect
+window.addEventListener('scroll', function() {
+    const nav = document.getElementById('mainNav');
+    if (window.scrollY > 50) {
+        nav.classList.add('scrolled');
+    } else {
+        nav.classList.remove('scrolled');
+    }
+});
+
+// ৩. টাইমার ফাংশন
+function startTimer(totalSeconds) {
+    let timer = totalSeconds;
+    let days, hours, minutes, seconds;
+    
+    let interval = setInterval(function () {
+        days = parseInt(timer / (3600 * 24), 10);
+        hours = parseInt((timer % (3600 * 24)) / 3600, 10);
         minutes = parseInt((timer % 3600) / 60, 10);
         seconds = parseInt(timer % 60, 10);
 
-        document.getElementById('days').textContent = "00";
+        document.getElementById('days').textContent = days < 10 ? "0" + days : days;
         document.getElementById('hours').textContent = hours < 10 ? "0" + hours : hours;
         document.getElementById('mins').textContent = minutes < 10 ? "0" + minutes : minutes;
         document.getElementById('secs').textContent = seconds < 10 ? "0" + seconds : seconds;
 
         if (--timer < 0) {
-            timer = duration;
+            clearInterval(interval);
         }
     }, 1000);
 }
 
 window.onload = function () {
-    let twentyFourHours = 24 * 60 * 60;
-    startTimer(twentyFourHours);
+    const D = 4, H = 18, M = 37, S = 29;
+    let totalSeconds = (D * 24 * 3600) + (H * 3600) + (M * 60) + S;
+    startTimer(totalSeconds);
 };
 
-// ৩. অর্ডার ফর্ম ও পিক্সেল ট্র্যাকিং
+// ৪. অর্ডার ফর্ম ও পিক্সেল ট্র্যাকিং
 document.getElementById('orderForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const submitBtn = document.querySelector('.order-submit-btn');
@@ -36,7 +53,7 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
     if(selectedWeight === '500g') price = 600;
     if(selectedWeight === '2kg') price = 2240;
 
-    submitBtn.innerText = "প্রসেস হচ্ছে...";
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> প্রসেস হচ্ছে...';
     submitBtn.disabled = true;
 
     // ফেসবুক পিক্সেল পারচেজ ইভেন্ট
@@ -50,9 +67,9 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
     }
 
     setTimeout(() => {
-        alert("ধন্যবাদ! আপনার অর্ডারটি গ্রহণ করা হয়েছে।");
+        alert("ধন্যবাদ! আপনার অর্ডারটি গ্রহণ করা হয়েছে। আমরা শীঘ্রই যোগাযোগ করবো।");
         document.getElementById('orderForm').reset();
-        submitBtn.innerText = "অর্ডার নিশ্চিত করুন";
+        submitBtn.innerHTML = "অর্ডার নিশ্চিত করুন";
         submitBtn.disabled = false;
     }, 1500);
 });
