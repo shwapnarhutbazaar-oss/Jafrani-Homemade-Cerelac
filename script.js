@@ -26,7 +26,7 @@ function updateTimer() {
 setInterval(updateTimer, 1000);
 updateTimer();
 
-// ৩. ফর্ম সাবমিশন
+// ৩. ফর্ম সাবমিশন ও পিক্সেল ট্র্যাকিং
 document.getElementById('orderForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const submitBtn = document.querySelector('.order-submit-btn');
@@ -38,7 +38,7 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
     submitBtn.innerText = "অর্ডার প্রসেস হচ্ছে...";
     submitBtn.disabled = true;
 
-    // পিক্সেল ট্র্যাকিং (যদি থাকে)
+    // পিক্সেল ট্র্যাকিং (সফল অর্ডারের পর ডাটা পাঠানো)
     if (typeof fbq === 'function') {
         fbq('track', 'Purchase', {
             content_name: 'Premium Jaffrani Homemade Cerelac',
