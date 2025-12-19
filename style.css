@@ -75,13 +75,22 @@ input:focus, textarea:focus {
     box-shadow: 0 0 10px rgba(255,87,34,0.2); 
 }
 
-/* Rest of your existing CSS (Mega Offer, Hero, Mobile Responsive etc.) follows exactly as you provided... */
-/* [Keep your previous styles here to maintain the design] */
-
 .top-announcement-bar { background: linear-gradient(90deg, #FF5722, #D84315); color: #fff; padding: 10px 0; text-align: center; font-size: 16px; font-weight: 600; }
 .nav-flex { display: flex; justify-content: space-between; align-items: center; }
-.logo { font-size: 24px; font-weight: 700; color: var(--secondary); text-decoration: none; }
+
+/* Updated Logo Style with Round Border */
+.logo { 
+    font-size: 24px; 
+    font-weight: 700; 
+    color: var(--secondary); 
+    text-decoration: none;
+    border: 2px solid var(--secondary); /* আপনার ফন্টের রঙের সাথে মিল রেখে বর্ডার */
+    padding: 5px 20px; 
+    border-radius: 50px; /* রাউন্ড করার জন্য */
+    display: inline-block;
+}
 .logo span { color: var(--primary); }
+
 .desktop-nav a { text-decoration: none; color: #444; margin-left: 20px; font-weight: 600; transition: 0.3s; }
 .desktop-nav a:hover { color: var(--primary); }
 .nav-cta { background: var(--primary); color: #fff !important; padding: 8px 18px; border-radius: 50px; }
@@ -132,7 +141,17 @@ input:focus, textarea:focus {
 .whatsapp-btn { position: fixed; bottom: 30px; right: 30px; background: var(--whatsapp); color: #fff; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; z-index: 1000; text-decoration: none; box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); }
 .wa-badge { position: absolute; top: 0; left: 0; background: #ff0000; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; animation: badge-bounce 1s infinite alternate; }
 footer { background: #1a1a1a; color: #fff; text-align: center; padding: 30px 0; }
+
 @keyframes floatImage { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 @keyframes pulseBadge { 0% { transform: rotate(15deg) scale(1); } 50% { transform: rotate(15deg) scale(1.1); } 100% { transform: rotate(15deg) scale(1); } }
 @keyframes badge-bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
-@media (max-width: 768px) { .hero-grid, .offer-wrapper-new { grid-template-columns: 1fr; text-align: center; } .hero-content h1 { font-size: 32px; } .desktop-nav { display: none; } .offer-wrapper-new { padding: 30px 20px; } .action-flex-container { justify-content: center; } .discount-badge-new { right: 10px; width: 80px; height: 80px; } .discount-badge-new .pct { font-size: 22px; } }
+
+@media (max-width: 768px) { 
+    .hero-grid, .offer-wrapper-new { grid-template-columns: 1fr; text-align: center; } 
+    .hero-content h1 { font-size: 32px; } 
+    .desktop-nav { display: none; } 
+    .offer-wrapper-new { padding: 30px 20px; } 
+    .action-flex-container { justify-content: center; } 
+    .discount-badge-new { right: 10px; width: 80px; height: 80px; } 
+    .discount-badge-new .pct { font-size: 22px; } 
+}
