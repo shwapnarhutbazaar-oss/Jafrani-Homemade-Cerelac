@@ -73,7 +73,7 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
     submitBtn.disabled = true;
 
     // গুগল শিটে ডেটা পাঠানো
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwbTFMk4ivQWSL1P9HWUQme_bsz-LnxZTEcIIv9KKNR08PcfjqUUpE3Cf4aIxmwIb5-/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzD2WZkc_rHrY8LmZxJ5V03Dj-5KcbDKOGtV8jqt50dzSnjfO62yAAtVqHt5TcM1-bA/exec';
     
     fetch(scriptURL, {
         method: 'POST',
