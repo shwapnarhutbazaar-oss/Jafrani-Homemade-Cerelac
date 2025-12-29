@@ -43,9 +43,9 @@ window.onload = function () {
     startTimer(totalSeconds);
 };
 
-// --- নতুন ট্র্যাকিং ইভেন্টসমূহ ---
+// --- আপডেট করা ট্র্যাকিং ইভেন্টসমূহ ---
 
-// ক. InitiateCheckout Tracking (যখন কেউ ফর্মের ইনপুট ফিল্ডে ক্লিক করবে)
+// ক. InitiateCheckout Tracking
 const orderFormInputs = document.querySelectorAll('#orderForm input, #orderForm textarea');
 let checkoutTracked = false;
 
@@ -58,12 +58,33 @@ orderFormInputs.forEach(input => {
                     currency: 'BDT'
                 });
             }
-            checkoutTracked = true; // এক ভিজিটে একবারই ট্র্যাক হবে
+            checkoutTracked = true; 
         }
     });
 });
 
-// খ. Custom WhatsApp Event Tracking
+// খ. AddToCart Tracking (ওজন সিলেক্ট করলে)
+const weightInputs = document.querySelectorAll('input[name="weight"]');
+weightInputs.forEach(input => {
+    input.addEventListener('change', function() {
+        let selectedVal = this.value;
+        let p = 1160; 
+        if(selectedVal === '500g') p = 600;
+        if(selectedVal === '2kg') p = 2240;
+
+        if (window.fbq) {
+            fbq('track', 'AddToCart', {
+                content_name: 'Premium Jaffrani Homemade Cerelac',
+                content_category: 'Cerelac',
+                value: p,
+                currency: 'BDT',
+                content_ids: [selectedVal]
+            });
+        }
+    });
+});
+
+// গ. Custom WhatsApp Event Tracking
 const whatsappBtn = document.querySelector('.whatsapp-btn');
 if (whatsappBtn) {
     whatsappBtn.addEventListener('click', function() {
@@ -75,7 +96,7 @@ if (whatsappBtn) {
     });
 }
 
-// ৪. অর্ডার ফর্ম প্রসেসিং ও Purchase ইভেন্ট
+// ৪. অর্ডার ফর্ম প্রসেসিং (Advanced Matching সহ Purchase ইভেন্ট)
 document.getElementById('orderForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const submitBtn = document.querySelector('.order-submit-btn');
@@ -111,13 +132,17 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
         body: `name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&weight=${encodeURIComponent(selectedWeight)}&price=${price}`
     })
     .then(() => {
-        // ফেসবুক পিক্সেল Purchase ইভেন্ট
+        // Advanced Matching সহ ফেসবুক পিক্সেল Purchase ইভেন্ট
         if (window.fbq) {
+            // ইউজার ডেটা ফেসবুককে জানানো (Advanced Matching)
             fbq('track', 'Purchase', {
                 content_name: 'Premium Jaffrani Homemade Cerelac',
                 value: price,
                 currency: 'BDT',
-                num_items: 1
+                num_items: 1,
+                external_id: phone, // ফোন নম্বর ইউনিক আইডি হিসেবে
+                fn: name,           // First Name (Advanced Matching)
+                ph: phone           // Phone (Advanced Matching)
             });
         }
 
