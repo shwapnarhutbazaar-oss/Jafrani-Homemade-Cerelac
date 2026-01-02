@@ -172,13 +172,10 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbwEa_Asinyo5a9xq7IlO_
         `;
         document.body.appendChild(successPopup);
 
-        // script.js এর একদম শেষের দিকে এই অংশটি খুজে পরিবর্তন করুন
-document.getElementById('closeSuccess').addEventListener('click', function() {
-    // পেজ রিলোড না করে শুধু পপআপ বন্ধ করা এবং ফর্ম রিসেট করা
-    document.getElementById('orderForm').reset(); 
-    const popup = this.closest('div').parentElement.parentElement;
-    if(popup) popup.remove();
-});
+        document.getElementById('closeSuccess').addEventListener('click', function() {
+            window.location.reload(); 
+        });
+    })
     .catch(error => {
         console.error('Error!', error.message);
         const loading = document.getElementById('customLoading');
