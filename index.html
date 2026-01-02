@@ -17,10 +17,14 @@
   
   fbq('init', '1194859455939328'); 
   
-  // PageView এবং ViewContent একসাথে লোড হবে যেন কোনো ডুপ্লিকেট না হয়
+  // শুধুমাত্র একবার রান হবে
   fbq('track', 'PageView');
+  
+  // ViewContent আলাদাভাবে ডাটা সহ পাঠানো হচ্ছে
   fbq('track', 'ViewContent', {
       content_name: 'Premium Jaffrani Homemade Cerelac',
+      content_category: 'Baby Food',
+      content_ids: ['jafrani_01'],
       content_type: 'product',
       value: 1160,
       currency: 'BDT'
