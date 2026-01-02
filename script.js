@@ -1,3 +1,7 @@
+// একটি ইউনিক ইভেন্ট আইডি তৈরির ফাংশন
+function generateEventID() {
+    return 'id_' + Math.floor(Math.random() * 1000000) + '_' + Date.now();
+}
 // ১. AOS (Animate On Scroll) ইনিশিয়েলাইজেশন
 AOS.init({ 
     duration: 1000, 
@@ -72,14 +76,15 @@ weightInputs.forEach(input => {
         if(selectedVal === '500g') p = 600;
         if(selectedVal === '2kg') p = 2240;
 
+        let eID = generateEventID(); // আইডি তৈরি
+
         if (window.fbq) {
             fbq('track', 'AddToCart', {
                 content_name: 'Premium Jaffrani Homemade Cerelac',
-                content_category: 'Cerelac',
                 value: p,
                 currency: 'BDT',
                 content_ids: [selectedVal]
-            });
+            }, {eventID: eID}); // এখানে eventID পাঠানো হচ্ছে
         }
     });
 });
@@ -123,7 +128,10 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
     document.body.appendChild(loadingOverlay);
     submitBtn.disabled = true;
 
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwbTFMk4ivQWSL1P9HWUQme_bsz-LnxZTEcIIv9KKNR08PcfjqUUpE3Cf4aIxmwIb5-/exec';
+   // script.js এর একদম উপরের দিকে এটি আপডেট করুন
+// আপনার নতুন গুগল স্ক্রিপ্ট ইউআরএল এখানে বসান
+// আপনার নতুন এবং সঠিক গুগল স্ক্রিপ্ট ইউআরএল
+const scriptURL = 'https://script.google.com/macros/s/AKfycbwEa_Asinyo5a9xq7IlO_nZ2qt-x5Tqm33e_9pkgDF7jW_8gOBm71c9Qa2auGViQOOw/exec';
     
     fetch(scriptURL, {
         method: 'POST',
@@ -132,19 +140,21 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
         body: `name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&weight=${encodeURIComponent(selectedWeight)}&price=${price}`
     })
     .then(() => {
-        // Advanced Matching সহ ফেসবুক পিক্সেল Purchase ইভেন্ট
-        if (window.fbq) {
-            // ইউজার ডেটা ফেসবুককে জানানো (Advanced Matching)
-            fbq('track', 'Purchase', {
-                content_name: 'Premium Jaffrani Homemade Cerelac',
-                value: price,
-                currency: 'BDT',
-                num_items: 1,
-                external_id: phone, // ফোন নম্বর ইউনিক আইডি হিসেবে
-                fn: name,           // First Name (Advanced Matching)
-                ph: phone           // Phone (Advanced Matching)
-            });
-        }
+    // প্রফেশনাল Purchase ট্র্যাকিং (Advanced Matching + Event ID সহ)
+    let pID = generateEventID(); // নতুন আইডি জেনারেট
+    if (window.fbq) {
+        fbq('track', 'Purchase', {
+            content_name: 'Premium Jaffrani Homemade Cerelac',
+            value: price,
+            currency: 'BDT',
+            num_items: 1,
+            external_id: phone, 
+            fn: name,           
+            ph: phone           
+        }, {eventID: pID}); // এখানে eventID পাঠানো হচ্ছে
+    }
+    
+    // বাকি সাকসেস পপআপ কোড...
 
         const loading = document.getElementById('customLoading');
         if(loading) loading.remove();
