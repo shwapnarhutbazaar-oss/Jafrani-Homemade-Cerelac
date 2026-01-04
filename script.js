@@ -2,6 +2,14 @@
 function generateEventID() {
     return 'id_' + Math.floor(Math.random() * 1000000) + '_' + Date.now();
 }
+// ইউজার ডাটা এনক্রিপশন ফাংশন (Privacy Protection)
+async function hashData(string) {
+    if (!string) return null;
+    const utf8 = new TextEncoder().encode(string.trim().toLowerCase());
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', utf8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 // ১. AOS (Animate On Scroll) ইনিশিয়েলাইজেশন
 AOS.init({ 
@@ -88,11 +96,26 @@ weightInputs.forEach(input => {
                 content_ids: [selectedVal]
             }, {eventID: eID});
         }
+        // GA4 Standard AddToCart ডাটা লেয়ার
+window.dataLayer = window.dataLayer || [];
+window.dataLayer.push({
+    'event': 'add_to_cart',
+    'ecommerce': {
+        'currency': 'BDT',
+        'value': p,
+        'items': [{
+            'item_id': selectedVal,
+            'item_name': 'Premium Jaffrani Homemade Cerelac',
+            'price': p,
+            'quantity': 1
+        }]
+    }
+});
     });
 });
 
 // ৪. অর্ডার ফর্ম প্রসেসিং
-document.getElementById('orderForm').addEventListener('submit', function(e) {
+document.getElementById('orderForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const submitBtn = document.querySelector('.order-submit-btn');
     
@@ -105,7 +128,7 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
     if(selectedWeight === '500g') price = 600;
     if(selectedWeight === '2kg') price = 2240;
 
-    // Loading Overlay
+    // Loading Overlay দেখানো
     const loadingOverlay = document.createElement('div');
     loadingOverlay.id = 'customLoading';
     loadingOverlay.innerHTML = `
@@ -121,52 +144,66 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
 
     const scriptURL = 'https://script.google.com/macros/s/AKfycbwEa_Asinyo5a9xq7IlO_nZ2qt-x5Tqm33e_9pkgDF7jW_8gOBm71c9Qa2auGViQOOw/exec';
     
-    fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&weight=${encodeURIComponent(selectedWeight)}&price=${price}`
-    })
-    .then(() => {
-        // ৫. ট্র্যাকিং ইভেন্টসমূহ (অর্ডার সফল হওয়ার পর)
-        let pID = generateEventID();
+    try {
+        await fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&weight=${encodeURIComponent(selectedWeight)}&price=${price}`
+        });
 
-        // Facebook Pixel Purchase
+        // ৫. ট্র্যাকিং ইভেন্টসমূহ (অর্ডার সফল হওয়ার পর)
+        const hashedPhone = await hashData(phone); 
+        const hashedName = await hashData(name);   
+        const pID = generateEventID();             
+
+        // ১. GA4 Standard Purchase
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            'event': 'purchase',
+            'ecommerce': {
+                'transaction_id': pID,
+                'value': price,
+                'currency': 'BDT',
+                'items': [{
+                    'item_id': selectedWeight,
+                    'item_name': 'Premium Jaffrani Homemade Cerelac',
+                    'price': price,
+                    'quantity': 1
+                }]
+            },
+            'user_data': { 'phone': hashedPhone, 'name': hashedName }
+        });
+
+        // ২. Google Ads Conversion
+        window.dataLayer.push({
+            'event': 'ads_conversion',
+            'conversion_value': price,
+            'event_id': pID
+        });
+
+        // ৩. Facebook Pixel Advanced Matching
         if (window.fbq) {
             fbq('track', 'Purchase', {
                 content_name: 'Premium Jaffrani Homemade Cerelac',
                 value: price,
                 currency: 'BDT',
-                num_items: 1,
-                external_id: phone, 
-                fn: name,           
-                ph: phone           
+                external_id: hashedPhone,
+                fn: hashedName,
+                ph: hashedPhone
             }, {eventID: pID});
         }
 
-        // GTM Data Layer
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-            'event': 'purchase_complete',
-            'value': price,
-            'currency': 'BDT',
-            'customer_name': name,
-            'customer_phone': phone,
-            'order_weight': selectedWeight,
-            'event_id': pID
-        });
-
-        // সাকসেস পপআপ
-        const loading = document.getElementById('customLoading');
-        if(loading) loading.remove();
+        // ৪. সাকসেস পপআপ
+        if(document.getElementById('customLoading')) document.getElementById('customLoading').remove();
         
         const successPopup = document.createElement('div');
         successPopup.innerHTML = `
             <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; font-family: 'Hind Siliguri', sans-serif; padding: 20px;">
                 <div style="background: white; padding: 40px; border-radius: 25px; text-align: center; max-width: 450px; width: 100%; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
                     <div style="font-size: 70px; color: #2ecc71; margin-bottom: 20px;"><i class="fas fa-check-circle"></i></div>
-                    <h2 style="color: #064e3b; margin-bottom: 15px; font-size: 28px;">অর্ডার সফল হয়েছে!</h2>
-                    <p style="color: #444; line-height: 1.6; margin-bottom: 30px; font-size: 18px;">ধন্যবাদ! আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।</p>
+                    <h2 style="color: #064e3b; margin-bottom: 15px; font-size: 28px;">অর্ডার সফল হয়েছে!</h2>
+                    <p style="color: #444; line-height: 1.6; margin-bottom: 30px; font-size: 18px;">ধন্যবাদ! আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।</p>
                     <button id="closeSuccess" style="background: #fbbf24; color: #064e3b; border: none; padding: 15px 40px; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; width: 100%;">ঠিক আছে</button>
                 </div>
             </div>
@@ -176,12 +213,11 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
         document.getElementById('closeSuccess').addEventListener('click', function() {
             window.location.reload(); 
         });
-    })
-    .catch(error => {
+
+    } catch (error) {
         console.error('Error!', error.message);
-        const loading = document.getElementById('customLoading');
-        if(loading) loading.remove();
-        alert("দুঃখিত, কোনো একটি সমস্যা হয়েছে।");
+        if(document.getElementById('customLoading')) document.getElementById('customLoading').remove();
+        alert("দুঃখিত, কোনো একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।");
         submitBtn.disabled = false;
-    });
+    }
 });
