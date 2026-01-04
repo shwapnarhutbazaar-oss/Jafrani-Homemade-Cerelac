@@ -237,4 +237,65 @@ footer { background: #1a1a1a; color: #fff; text-align: center; padding: 30px 0; 
 
     /* Announcement Bar Mobile */
     .top-announcement-bar { font-size: 13px; padding: 8px 5px; }
+}/* Floating Order Button Style */
+.floating-order-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px; /* এটি বাম পাশে থাকবে কারণ ডান পাশে হোয়াটসঅ্যাপ বাটন আছে */
+    background: var(--primary); /* আপনার থিমের লাল/কমলা রঙ */
+    color: #fff;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    z-index: 1000;
+    text-decoration: none;
+    box-shadow: 0 10px 25px rgba(255, 87, 34, 0.4);
+    animation: float 3s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+/* মাউস নিলে টেক্সট দেখাবে (Desktop এর জন্য) */
+.order-text-tooltip {
+    position: absolute;
+    left: 75px;
+    background: #333;
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+}
+
+.floating-order-btn:hover .order-text-tooltip {
+    opacity: 1;
+    visibility: visible;
+    left: 85px;
+}
+
+.floating-order-btn:hover {
+    transform: scale(1.1);
+    background: var(--secondary); /* হোভার করলে সবুজ হবে */
+}
+
+/* মোবাইল রেসপন্সিভ পরিবর্তন */
+@media (max-width: 768px) {
+    .floating-order-btn {
+        bottom: 85px; /* মোবাইল ফুটারে স্টিকি বাটন থাকে তাই একটু উপরে রাখা হয়েছে */
+        left: 20px;
+        width: 55px;
+        height: 55px;
+        font-size: 22px;
+    }
+    
+    /* মোবাইলে টুলটিপ দরকার নেই */
+    .order-text-tooltip {
+        display: none;
+    }
 }
