@@ -5,58 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
 
-      const PIXEL_ID = '1194859455939328';
-      const SERVER_URL = 'https://server-side-tracker.vercel.app/api/event';
+  const PIXEL_ID = '1194859455939328';
+  const SERVER_URL = 'https://server-side-tracker.vercel.app/api/event';
 
-      fbq('init', PIXEL_ID);
+  fbq('init', PIXEL_ID);
+  fbq('track', 'PageView');
 
-      // সব ইভেন্ট (Browser + Server) হ্যান্ডেল করার জন্য মূল ফাংশন
-      async function trackProEvent(eventName, eventData = {}) {
-        const eventId = eventData.eventID || 'event_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        
-        // ১. Browser Tracking (Meta Pixel)
-        fbq('track', eventName, eventData, { eventID: eventId });
+  async function trackProEvent(eventName, eventData = {}) {
+    // একটি ফিক্সড ইভেন্ট আইডি নিশ্চিত করা
+    const eventId = eventData.eventID || 'event_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    // Browser Tracking
+    fbq('track', eventName, eventData, { eventID: eventId });
 
-        // ২. Server Tracking (Conversion API)
-        try {
-          fetch(SERVER_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              eventName: eventName,
-              eventId: eventId,
-              pixelId: PIXEL_ID,
-              userData: {
-                client_user_agent: navigator.userAgent,
-                fbp: document.cookie.split('; ').find(row => row.startsWith('_fbp='))?.split('=')[1],
-                fbc: new URLSearchParams(window.location.search).get('fbclid')
-              },
-              customData: eventData,
-              eventSourceUrl: window.location.href
-            })
-          });
-        } catch (err) { console.error('Tracking Error:', err); }
-      }
-
-      // পেজ লোড হওয়ার সাথে সাথে ইভেন্টগুলো কল করা
-      trackProEvent('PageView');
-      
-      trackProEvent('ViewContent', {
-          content_name: 'Premium Jaffrani Homemade Cerelac',
-          content_type: 'product',
-          value: 1160,
-          currency: 'BDT'
+    // Server Tracking (CAPI)
+    try {
+      fetch(SERVER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventName: eventName,
+          eventId: eventId,
+          pixelId: PIXEL_ID,
+          userData: {
+            client_user_agent: navigator.userAgent,
+            fbp: document.cookie.split('; ').find(row => row.startsWith('_fbp='))?.split('=')[1],
+            fbc: new URLSearchParams(window.location.search).get('fbclid')
+          },
+          customData: eventData,
+          eventSourceUrl: window.location.href
+        })
       });
-    </script>
+    } catch (err) { console.error('Tracking Error:', err); }
+  }
+
+  // পেজ লোড হলে একবারই ভিউ কনটেন্ট ফায়ার হবে
+  window.addEventListener('load', () => {
+    trackProEvent('ViewContent', {
+        content_name: 'Premium Jaffrani Homemade Cerelac',
+        content_type: 'product',
+        value: 1160,
+        currency: 'BDT'
+    });
+  });
+</script>
 
     <link rel="stylesheet" href="style.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
