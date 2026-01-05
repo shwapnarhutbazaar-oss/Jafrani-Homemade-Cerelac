@@ -1,8 +1,9 @@
-// একটি ইউনিক ইভেন্ট আইডি তৈরির ফাংশন
+// ১. একটি ইউনিক ইভেন্ট আইডি তৈরির ফাংশন
 function generateEventID() {
     return 'id_' + Math.floor(Math.random() * 1000000) + '_' + Date.now();
 }
-// ইউজার ডাটা এনক্রিপশন ফাংশন (Privacy Protection)
+
+// ২. ইউজার ডাটা এনক্রিপশন ফাংশন (Privacy Protection)
 async function hashData(string) {
     if (!string) return null;
     const utf8 = new TextEncoder().encode(string.trim().toLowerCase());
@@ -11,14 +12,14 @@ async function hashData(string) {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// ১. AOS (Animate On Scroll) ইনিশিয়েলাইজেশন
+// ৩. AOS (Animate On Scroll) ইনিশিয়েলাইজেশন
 AOS.init({ 
     duration: 1000, 
     once: false, 
     mirror: true 
 });
 
-// ২. Navbar Scroll Effect
+// ৪. Navbar Scroll Effect
 window.addEventListener('scroll', function() {
     const nav = document.getElementById('mainNav');
     if (nav) {
@@ -30,7 +31,7 @@ window.addEventListener('scroll', function() {
     }
 });
 
-// ৩. টাইমার ফাংশন
+// ৫. টাইমার ফাংশন
 function startTimer(totalSeconds) {
     let timer = totalSeconds;
     let days, hours, minutes, seconds;
@@ -58,18 +59,19 @@ window.onload = function () {
     startTimer(totalSeconds);
 };
 
-// --- ট্র্যাকিং ইভেন্টসমূহ ---
+// --- উন্নত ট্র্যাকিং ইভেন্টসমূহ (Browser + Server) ---
 
-// ক. InitiateCheckout Tracking
+// ক. InitiateCheckout Tracking (যখন ইউজার ফর্মে ক্লিক করবে)
 const orderFormInputs = document.querySelectorAll('#orderForm input, #orderForm textarea');
 let checkoutTracked = false;
 
 orderFormInputs.forEach(input => {
     input.addEventListener('focus', function() {
         if (!checkoutTracked) {
-            if (window.fbq) {
-                fbq('track', 'InitiateCheckout', {
+            if (typeof trackProEvent === 'function') {
+                trackProEvent('InitiateCheckout', {
                     content_name: 'Premium Jaffrani Homemade Cerelac',
+                    content_category: 'Baby Food',
                     currency: 'BDT'
                 });
             }
@@ -78,7 +80,7 @@ orderFormInputs.forEach(input => {
     });
 });
 
-// খ. AddToCart Tracking
+// খ. AddToCart Tracking (যখন ইউজার ওজন বা পরিমাণ পরিবর্তন করবে)
 const weightInputs = document.querySelectorAll('input[name="weight"]');
 weightInputs.forEach(input => {
     input.addEventListener('change', function() {
@@ -87,34 +89,19 @@ weightInputs.forEach(input => {
         if(selectedVal === '500g') p = 600;
         if(selectedVal === '2kg') p = 2240;
 
-        let eID = generateEventID();
-        if (window.fbq) {
-            fbq('track', 'AddToCart', {
+        if (typeof trackProEvent === 'function') {
+            trackProEvent('AddToCart', {
                 content_name: 'Premium Jaffrani Homemade Cerelac',
                 value: p,
                 currency: 'BDT',
-                content_ids: [selectedVal]
-            }, {eventID: eID});
+                content_ids: [selectedVal],
+                content_type: 'product'
+            });
         }
-        // GA4 Standard AddToCart ডাটা লেয়ার
-window.dataLayer = window.dataLayer || [];
-window.dataLayer.push({
-    'event': 'add_to_cart',
-    'ecommerce': {
-        'currency': 'BDT',
-        'value': p,
-        'items': [{
-            'item_id': selectedVal,
-            'item_name': 'Premium Jaffrani Homemade Cerelac',
-            'price': p,
-            'quantity': 1
-        }]
-    }
-});
     });
 });
 
-// ৪. অর্ডার ফর্ম প্রসেসিং
+// গ. অর্ডার ফর্ম প্রসেসিং এবং Purchase Tracking
 document.getElementById('orderForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const submitBtn = document.querySelector('.order-submit-btn');
@@ -128,10 +115,9 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
     if(selectedWeight === '500g') price = 600;
     if(selectedWeight === '2kg') price = 2240;
 
-    // একটি ইউনিক ইভেন্ট আইডি জেনারেট করা (Deduplication এর জন্য)
     const pID = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
-    // Loading Overlay দেখানো
+    // লোডিং অ্যানিমেশন দেখানো
     const loadingOverlay = document.createElement('div');
     loadingOverlay.id = 'customLoading';
     loadingOverlay.innerHTML = `
@@ -145,11 +131,10 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
     document.body.appendChild(loadingOverlay);
     submitBtn.disabled = true;
 
-    // আপনার নতুন Google Apps Script URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzjD7vlyYEBDZFmH8JvOE62bZplRDTH5D_tRGfj_fHgFLeaKDtJbIFC3qc5XibMS1hF/exec';
     
     try {
-        // গুগল শিটে ডাটা পাঠানো (সাথে eventID যোগ করা হয়েছে)
+        // গুগল শিটে ডাটা পাঠানো
         await fetch(scriptURL, {
             method: 'POST',
             mode: 'no-cors',
@@ -157,24 +142,41 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
             body: `name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&weight=${encodeURIComponent(selectedWeight)}&price=${price}&eventID=${pID}`
         });
 
-        // ৫. ট্র্যাকিং ইভেন্টসমূহ (অর্ডার সফল হওয়ার পর)
+        // ৫. Purchase Tracking (Browser + Server-Side API)
         const hashedPhone = await hashData(phone); 
         const hashedName = await hashData(name);    
 
-        // Facebook Pixel + Server-Side (CAPI) Tracking
         if (typeof trackProEvent === 'function') {
             trackProEvent('Purchase', {
                 content_name: 'Premium Jaffrani Homemade Cerelac',
                 value: price,
                 currency: 'BDT',
-                external_id: hashedPhone,
+                num_items: 1,
+                content_ids: [selectedWeight],
+                ph: hashedPhone, // সার্ভার সাইড ম্যাচিংয়ের জন্য
                 fn: hashedName,
-                ph: hashedPhone,
                 eventID: pID 
             });
         }
 
-        // সাকসেস পপআপ দেখানো
+        // ডাটা লেয়ার ফর গুগল ট্যাগ ম্যানেজার (ঐচ্ছিক)
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            'event': 'purchase',
+            'ecommerce': {
+                'transaction_id': pID,
+                'value': price,
+                'currency': 'BDT',
+                'items': [{
+                    'item_name': 'Premium Jaffrani Homemade Cerelac',
+                    'item_id': selectedWeight,
+                    'price': price,
+                    'quantity': 1
+                }]
+            }
+        });
+
+        // সাকসেস মেসেজ দেখানো
         if(document.getElementById('customLoading')) document.getElementById('customLoading').remove();
         
         const successPopup = document.createElement('div');
