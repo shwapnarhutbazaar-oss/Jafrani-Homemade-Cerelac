@@ -128,6 +128,9 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
     if(selectedWeight === '500g') price = 600;
     if(selectedWeight === '2kg') price = 2240;
 
+    // একটি ইউনিক ইভেন্ট আইডি জেনারেট করা (Deduplication এর জন্য)
+    const pID = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
     // Loading Overlay দেখানো
     const loadingOverlay = document.createElement('div');
     loadingOverlay.id = 'customLoading';
@@ -142,59 +145,36 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
     document.body.appendChild(loadingOverlay);
     submitBtn.disabled = true;
 
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwEa_Asinyo5a9xq7IlO_nZ2qt-x5Tqm33e_9pkgDF7jW_8gOBm71c9Qa2auGViQOOw/exec';
+    // আপনার নতুন Google Apps Script URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzjD7vlyYEBDZFmH8JvOE62bZplRDTH5D_tRGfj_fHgFLeaKDtJbIFC3qc5XibMS1hF/exec';
     
     try {
+        // গুগল শিটে ডাটা পাঠানো (সাথে eventID যোগ করা হয়েছে)
         await fetch(scriptURL, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&weight=${encodeURIComponent(selectedWeight)}&price=${price}`
+            body: `name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&weight=${encodeURIComponent(selectedWeight)}&price=${price}&eventID=${pID}`
         });
 
         // ৫. ট্র্যাকিং ইভেন্টসমূহ (অর্ডার সফল হওয়ার পর)
         const hashedPhone = await hashData(phone); 
-        const hashedName = await hashData(name);   
-        const pID = generateEventID();             
+        const hashedName = await hashData(name);    
 
-        // ১. GA4 Standard Purchase
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-            'event': 'purchase',
-            'ecommerce': {
-                'transaction_id': pID,
-                'value': price,
-                'currency': 'BDT',
-                'items': [{
-                    'item_id': selectedWeight,
-                    'item_name': 'Premium Jaffrani Homemade Cerelac',
-                    'price': price,
-                    'quantity': 1
-                }]
-            },
-            'user_data': { 'phone': hashedPhone, 'name': hashedName }
-        });
-
-        // ২. Google Ads Conversion
-        window.dataLayer.push({
-            'event': 'ads_conversion',
-            'conversion_value': price,
-            'event_id': pID
-        });
-
-        // ৩. Facebook Pixel Advanced Matching
-        if (window.fbq) {
-            fbq('track', 'Purchase', {
+        // Facebook Pixel + Server-Side (CAPI) Tracking
+        if (typeof trackProEvent === 'function') {
+            trackProEvent('Purchase', {
                 content_name: 'Premium Jaffrani Homemade Cerelac',
                 value: price,
                 currency: 'BDT',
                 external_id: hashedPhone,
                 fn: hashedName,
-                ph: hashedPhone
-            }, {eventID: pID});
+                ph: hashedPhone,
+                eventID: pID 
+            });
         }
 
-        // ৪. সাকসেস পপআপ
+        // সাকসেস পপআপ দেখানো
         if(document.getElementById('customLoading')) document.getElementById('customLoading').remove();
         
         const successPopup = document.createElement('div');
@@ -203,7 +183,7 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
                 <div style="background: white; padding: 40px; border-radius: 25px; text-align: center; max-width: 450px; width: 100%; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
                     <div style="font-size: 70px; color: #2ecc71; margin-bottom: 20px;"><i class="fas fa-check-circle"></i></div>
                     <h2 style="color: #064e3b; margin-bottom: 15px; font-size: 28px;">অর্ডার সফল হয়েছে!</h2>
-                    <p style="color: #444; line-height: 1.6; margin-bottom: 30px; font-size: 18px;">ধন্যবাদ! আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।</p>
+                    <p style="color: #444; line-height: 1.6; margin-bottom: 30px; font-size: 18px;">ধন্যবাদ! আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে। আমাদের প্রতিনিধি শীঘ্রই আপনার সাথে যোগাযোগ করবেন।</p>
                     <button id="closeSuccess" style="background: #fbbf24; color: #064e3b; border: none; padding: 15px 40px; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; width: 100%;">ঠিক আছে</button>
                 </div>
             </div>
