@@ -14,35 +14,34 @@
   s.parentNode.insertBefore(t,s)}(window, document,'script',
   'https://connect.facebook.net/en_US/fbevents.js');
 
- const PIXEL_ID = '1194859455939328';
+  const PIXEL_ID = '1194859455939328';
   const SERVER_URL = 'https://server-side-tracker.vercel.app/api/event'; 
 
   // পিক্সেল ইনিশিয়েলাইজ
   fbq('init', PIXEL_ID);
-  // PageView লাইনটি এখান থেকে সরিয়ে দেওয়া হয়েছে কারণ এটি GTM থেকে ফায়ার হচ্ছে
+  
+  // পিক্সেল অ্যাক্টিভেট করার জন্য নিচের লাইনটি অবশ্যই লাগবে
+  fbq('track', 'PageView'); 
 
   async function trackProEvent(eventName, eventData = {}) {
-    // ইউনিক ইভেন্ট আইডি তৈরি (ব্রাউজার এবং সার্ভারের জন্য একই আইডি)
     const eventId = eventData.eventID || 'id_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     
-    // ১. Browser Side Event (Meta Pixel)
+    // Browser Side
     fbq('track', eventName, eventData, { eventID: eventId });
 
-    // ২. Server-Side (CAPI) ট্র্যাকিং
+    // Server-Side (CAPI)
     try {
       fetch(SERVER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           eventName: eventName,
-          eventID: eventId, // এখানেও বড় হাতের 'ID' ব্যবহার করা ভালো
+          eventID: eventId,
           pixelId: PIXEL_ID,
           userData: {
             client_user_agent: navigator.userAgent,
             fbp: document.cookie.split('; ').find(row => row.startsWith('_fbp='))?.split('=')[1],
-            fbc: new URLSearchParams(window.location.search).get('fbclid'),
-            ph: eventData.ph || null, // ফোন নম্বর থাকলে পাঠাবে
-            fn: eventData.fn || null  // নাম থাকলে পাঠাবে
+            fbc: new URLSearchParams(window.location.search).get('fbclid')
           },
           customData: eventData
         })
