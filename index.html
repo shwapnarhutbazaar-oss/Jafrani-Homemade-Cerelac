@@ -14,49 +14,43 @@
   s.parentNode.insertBefore(t,s)}(window, document,'script',
   'https://connect.facebook.net/en_US/fbevents.js');
 
-  const PIXEL_ID = '1194859455939328';
-  const SERVER_URL = 'https://server-side-tracker.vercel.app/api/event';
+ const PIXEL_ID = '1194859455939328';
+  const SERVER_URL = 'https://server-side-tracker.vercel.app/api/event'; 
 
+  // পিক্সেল ইনিশিয়েলাইজ
   fbq('init', PIXEL_ID);
-  fbq('track', 'PageView');
+  // PageView লাইনটি এখান থেকে সরিয়ে দেওয়া হয়েছে কারণ এটি GTM থেকে ফায়ার হচ্ছে
 
   async function trackProEvent(eventName, eventData = {}) {
-    // একটি ফিক্সড ইভেন্ট আইডি নিশ্চিত করা
-    const eventId = eventData.eventID || 'event_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    // ইউনিক ইভেন্ট আইডি তৈরি (ব্রাউজার এবং সার্ভারের জন্য একই আইডি)
+    const eventId = eventData.eventID || 'id_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     
-    // Browser Tracking
+    // ১. Browser Side Event (Meta Pixel)
     fbq('track', eventName, eventData, { eventID: eventId });
 
-    // Server Tracking (CAPI)
+    // ২. Server-Side (CAPI) ট্র্যাকিং
     try {
       fetch(SERVER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           eventName: eventName,
-          eventId: eventId,
+          eventID: eventId, // এখানেও বড় হাতের 'ID' ব্যবহার করা ভালো
           pixelId: PIXEL_ID,
           userData: {
             client_user_agent: navigator.userAgent,
             fbp: document.cookie.split('; ').find(row => row.startsWith('_fbp='))?.split('=')[1],
-            fbc: new URLSearchParams(window.location.search).get('fbclid')
+            fbc: new URLSearchParams(window.location.search).get('fbclid'),
+            ph: eventData.ph || null, // ফোন নম্বর থাকলে পাঠাবে
+            fn: eventData.fn || null  // নাম থাকলে পাঠাবে
           },
-          customData: eventData,
-          eventSourceUrl: window.location.href
+          customData: eventData
         })
       });
-    } catch (err) { console.error('Tracking Error:', err); }
+    } catch (err) { 
+      console.error('CAPI Error:', err); 
+    }
   }
-
-  // পেজ লোড হলে একবারই ভিউ কনটেন্ট ফায়ার হবে
-  window.addEventListener('load', () => {
-    trackProEvent('ViewContent', {
-        content_name: 'Premium Jaffrani Homemade Cerelac',
-        content_type: 'product',
-        value: 1160,
-        currency: 'BDT'
-    });
-  });
 </script>
 
     <link rel="stylesheet" href="style.css">
@@ -203,27 +197,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
     </section>
-    <section id="reviews" class="reviews-section" style="padding: 60px 0; background: #fff8f5;">
+    <section id="reviews" class="reviews-section" style="padding: 60px 0; background: #fff8f5; overflow: hidden;">
     <div class="container">
         <div class="section-title" style="text-align: center; margin-bottom: 40px;" data-aos="fade-up">
-            <h2 style="font-size: 32px; color: #004D40;">সম্মানিত <span class="highlight">গ্রাহকদের ফিডব্যাক</span></h2>
-            <p>আমাদের সম্পর্কে মায়েরা যা বলছেন (স্ক্রিনশট)</p>
+            <h2 style="font-size: 32px; color: #004D40; font-family: 'Hind Siliguri', sans-serif;">সম্মানিত <span class="highlight" style="color: #fbbf24;">গ্রাহকদের ফিডব্যাক</span></h2>
+            <p style="font-family: 'Hind Siliguri', sans-serif;">আমাদের সম্পর্কে মায়েরা যা বলছেন (স্ক্রিনশট)</p>
         </div>
 
-        <div class="review-image-grid">
-            <div class="review-img-card" data-aos="zoom-in">
-                <img src="আপনার_ছবির_লিঙ্ক_১" alt="Review 1">
+        <div class="slider-container" style="max-width: 500px; margin: 0 auto; overflow: hidden; position: relative; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.1);">
+            <div class="review-slider" id="reviewSlider" style="display: flex; transition: transform 0.8s ease-in-out;">
+                <div class="slide" style="min-width: 100%;"><img src="আপনার_ছবির_লিঙ্ক_1" style="width: 100%; display: block;"></div>
+                <div class="slide" style="min-width: 100%;"><img src="আপনার_ছবির_লিঙ্ক_2" style="width: 100%; display: block;"></div>
+                <div class="slide" style="min-width: 100%;"><img src="আপনার_ছবির_লিঙ্ক_3" style="width: 100%; display: block;"></div>
+                <div class="slide" style="min-width: 100%;"><img src="আপনার_ছবির_লিঙ্ক_4" style="width: 100%; display: block;"></div>
+                <div class="slide" style="min-width: 100%;"><img src="আপনার_ছবির_লিঙ্ক_5" style="width: 100%; display: block;"></div>
+                <div class="slide" style="min-width: 100%;"><img src="আপনার_ছবির_লিঙ্ক_6" style="width: 100%; display: block;"></div>
+                <div class="slide" style="min-width: 100%;"><img src="আপনার_ছবির_লিঙ্ক_7" style="width: 100%; display: block;"></div>
+                <div class="slide" style="min-width: 100%;"><img src="আপনার_ছবির_লিঙ্ক_8" style="width: 100%; display: block;"></div>
+                <div class="slide" style="min-width: 100%;"><img src="আপনার_ছবির_লিঙ্ক_9" style="width: 100%; display: block;"></div>
+                <div class="slide" style="min-width: 100%;"><img src="আপনার_ছবির_লিঙ্ক_10" style="width: 100%; display: block;"></div>
+                <div class="slide" style="min-width: 100%;"><img src="আপনার_ছবির_লিঙ্ক_11" style="width: 100%; display: block;"></div>
+                
             </div>
-
-            <div class="review-img-card" data-aos="zoom-in" data-aos-delay="100">
-                <img src="আপনার_ছবির_লিঙ্ক_২" alt="Review 2">
-            </div>
-
-            <div class="review-img-card" data-aos="zoom-in" data-aos-delay="200">
-                <img src="আপনার_ছবির_লিঙ্ক_৩" alt="Review 3">
-            </div>
-            
-            </div>
+        </div>
     </div>
 </section>
     <section id="order" class="order-section">
