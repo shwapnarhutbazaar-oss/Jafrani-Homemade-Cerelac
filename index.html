@@ -5,39 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-
-  const PIXEL_ID = '1194859455939328';
-  const SERVER_URL = 'https://server-side-tracker.vercel.app/api/event'; 
-
-  // পিক্সেল ইনিশিয়েলাইজ
-  fbq('init', PIXEL_ID);
-  
-  // পিক্সেল অ্যাক্টিভেট করার জন্য নিচের লাইনটি অবশ্যই লাগবে
-  fbq('track', 'PageView'); 
-
   async function trackProEvent(eventName, eventData = {}) {
+    if (!eventName) return;
+
     const eventId = eventData.eventID || 'id_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     
     // Browser Side
     fbq('track', eventName, eventData, { eventID: eventId });
 
-    // Server-Side (CAPI)
+    // Server-Side (CAPI) - এখানে সরাসরি URL এবং ID দিন
     try {
-      fetch(SERVER_URL, {
+      fetch('https://server-side-tracker.vercel.app/api/event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           eventName: eventName,
           eventID: eventId,
-          pixelId: PIXEL_ID,
+          pixelId: '1194859455939328', 
           userData: {
             client_user_agent: navigator.userAgent,
             fbp: document.cookie.split('; ').find(row => row.startsWith('_fbp='))?.split('=')[1],
