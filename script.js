@@ -2,7 +2,6 @@
  * ১. ইউটিলিটি ফাংশনসমূহ (ID Generation & Encryption)
  */
 function generateEventID() {
-    // নিখুঁত ডিডুপ্লিকেশনের জন্য একটি ইউনিক আইডি তৈরি
     return 'id_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
 }
 
@@ -15,13 +14,9 @@ async function hashData(string) {
 }
 
 /**
- * ২. ইন্টারফেস অ্যানিমেশন (AOS & Navbar)
+ * ২. ইন্টারফেস অ্যানিমেশন (AOS)
  */
-AOS.init({ 
-    duration: 1000, 
-    once: true, // পারফরম্যান্সের জন্য একবার অ্যানিমেশন হওয়া ভালো
-    mirror: false 
-});
+AOS.init({ duration: 1000, once: true });
 
 window.addEventListener('scroll', function() {
     const nav = document.getElementById('mainNav');
@@ -56,45 +51,38 @@ window.onload = function () {
 };
 
 /**
- * ৪. ট্র্যাকিং ইভেন্টসমূহ (Meta Pixel & Conversion API)
+ * ৪. ট্র্যাকিং ও অর্ডার হ্যান্ডলিং
  */
 
-// ক. InitiateCheckout (ইউজার যখন ফর্মে ফোকাস করবে)
+// ক. InitiateCheckout
 let checkoutTracked = false;
 document.querySelectorAll('#orderForm input, #orderForm textarea').forEach(input => {
     input.addEventListener('focus', function() {
-        if (!checkoutTracked && typeof trackProEvent === 'function') {
-            trackProEvent('InitiateCheckout', {
-                content_name: 'Premium Jaffrani Homemade Cerelac',
-                content_category: 'Baby Food',
-                currency: 'BDT'
-            });
+        if (!checkoutTracked) {
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ 'event': 'initiate_checkout' });
             checkoutTracked = true; 
         }
     });
 });
 
-// খ. AddToCart (ওজন নির্বাচনের সময়)
+// খ. AddToCart
 document.querySelectorAll('input[name="weight"]').forEach(input => {
     input.addEventListener('change', function() {
         let selectedVal = this.value;
         let price = selectedVal === '500g' ? 600 : (selectedVal === '2kg' ? 2240 : 1160);
-
-        if (typeof trackProEvent === 'function') {
-            trackProEvent('AddToCart', {
-                content_name: 'Premium Jaffrani Homemade Cerelac',
-                value: price,
-                currency: 'BDT',
-                content_ids: [selectedVal],
-                content_type: 'product'
-            });
-        }
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            'event': 'add_to_cart',
+            'ecommerce': { 'value': price, 'items': [{ 'item_name': 'Zafrani Cerelac', 'price': price }] }
+        });
     });
 });
 
-// গ. Purchase (অর্ডার সাবমিট এবং গুগল শিট)
+// গ. Order Submission (CAPI Integration সহ)
 document.getElementById('orderForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    
     const submitBtn = document.querySelector('.order-submit-btn');
     const name = document.getElementById('name').value;
     const phone = document.getElementById('phone').value;
@@ -102,102 +90,100 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
     const selectedWeight = document.querySelector('input[name="weight"]:checked').value;
     
     let price = selectedWeight === '500g' ? 600 : (selectedWeight === '2kg' ? 2240 : 1160);
-    const pID = generateEventID(); // ইউনিক ইভেন্ট আইডি
+    const pID = 'SHB-' + Date.now(); 
 
-    // লোডিং অ্যানিমেশন দেখানো
+    // GTM Purchase Event
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        'event': 'purchase',
+        'ecommerce': {
+            'transaction_id': pID,
+            'value': price,
+            'currency': 'BDT',
+            'items': [{ 'item_name': 'Zafrani Cerelac', 'item_variant': selectedWeight, 'price': price, 'quantity': 1 }]
+        }
+    });
+
+    // Loading Show
     const loadingOverlay = document.createElement('div');
     loadingOverlay.id = 'customLoading';
-    loadingOverlay.innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Hind Siliguri', sans-serif; backdrop-filter: blur(5px);">
-            <div style="border: 5px solid #333; border-top: 5px solid #fbbf24; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-            <h3 style="margin-top: 25px; font-size: 22px; color: #fbbf24;">প্রসেসিং হচ্ছে...</h3>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
-    `;
+    loadingOverlay.innerHTML = `<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; backdrop-filter: blur(5px);"><div style="border: 5px solid #333; border-top: 5px solid #fbbf24; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div><h3 style="margin-top: 25px; color: #fbbf24;">প্রসেসিং হচ্ছে...</h3></div><style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
     document.body.appendChild(loadingOverlay);
     submitBtn.disabled = true;
 
     try {
-        // ১. গুগল শিটে ডাটা পাঠানো
+        // ১. Google Sheet-এ ডাটা পাঠানো
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzjD7vlyYEBDZFmH8JvOE62bZplRDTH5D_tRGfj_fHgFLeaKDtJbIFC3qc5XibMS1hF/exec';
-        await fetch(scriptURL, {
+        const sheetPromise = fetch(scriptURL, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&weight=${encodeURIComponent(selectedWeight)}&price=${price}&eventID=${pID}`
         });
 
-        // ২. ফেসবুক পারচেজ ট্র্যাকিং (Browser + Server)
-        const hashedPhone = await hashData(phone); 
-        const hashedName = await hashData(name);    
+        // ২. ফেসবুক সার্ভার ট্র্যাকিং (Cloudflare CAPI) পাঠানো
+        const capiPromise = sendToCAPI('Purchase', price, pID, phone);
 
-        if (typeof trackProEvent === 'function') {
-            trackProEvent('Purchase', {
-                content_name: 'Premium Jaffrani Homemade Cerelac',
-                value: price,
-                currency: 'BDT',
-                num_items: 1,
-                content_ids: [selectedWeight],
-                ph: hashedPhone,
-                fn: hashedName,
-                eventID: pID // অবশ্যই 'eventID' বড় হাতের অক্ষরে হবে
-            });
-        }
+        // উভয় কাজ শেষ হওয়া পর্যন্ত অপেক্ষা
+        await Promise.allSettled([sheetPromise, capiPromise]);
 
-        // ৩. Data Layer (GTM এর জন্য)
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-            'event': 'purchase',
-            'ecommerce': {
-                'transaction_id': pID,
-                'value': price,
-                'currency': 'BDT',
-                'items': [{ 'item_name': 'Premium Jaffrani Homemade Cerelac', 'item_id': selectedWeight, 'price': price, 'quantity': 1 }]
-            }
-        });
-
-        // ৪. সাকসেস পপআপ দেখানো
         if(document.getElementById('customLoading')) document.getElementById('customLoading').remove();
         showSuccessPopup();
 
     } catch (error) {
-        console.error('Submission Error:', error);
         if(document.getElementById('customLoading')) document.getElementById('customLoading').remove();
-        alert("দুঃখিত, অর্ডারটি সম্পন্ন হয়নি। আবার চেষ্টা করুন।");
+        alert("দুঃখিত, আবার চেষ্টা করুন।");
         submitBtn.disabled = false;
     }
 });
 
+/**
+ * ৫. Cloudflare Worker এ ডাটা পাঠানোর ফাংশন
+ */
+async function sendToCAPI(eventName, price, eventID, phone) {
+    const hashedPhone = await hashData(phone); 
+    const workerURL = "https://fb-capi.torikulislamsayem5555.workers.dev/"; 
+
+    try {
+        await fetch(workerURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                event_name: eventName,
+                event_id: eventID,
+                value: price,
+                ph: hashedPhone,
+                source_url: window.location.href
+            })
+        });
+    } catch (e) {
+        console.log("CAPI Error");
+    }
+}
+
+/**
+ * ৬. পপআপ ও স্লাইডার লজিক
+ */
 function showSuccessPopup() {
     const popup = document.createElement('div');
     popup.innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; font-family: 'Hind Siliguri', sans-serif; padding: 20px;">
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
             <div style="background: white; padding: 40px; border-radius: 25px; text-align: center; max-width: 450px; width: 100%;">
                 <div style="font-size: 70px; color: #2ecc71; margin-bottom: 20px;"><i class="fas fa-check-circle"></i></div>
                 <h2 style="color: #064e3b; margin-bottom: 15px;">অর্ডার সফল হয়েছে!</h2>
-                <p style="color: #444; margin-bottom: 30px;">ধন্যবাদ! আমাদের প্রতিনিধি শীঘ্রই আপনার সাথে যোগাযোগ করবেন।</p>
                 <button onclick="window.location.reload()" style="background: #fbbf24; color: #064e3b; border: none; padding: 15px 40px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%;">ঠিক আছে</button>
             </div>
         </div>
     `;
     document.body.appendChild(popup);
 }
-// অটোমেটিক রিভিউ স্লাইডার লজিক
+
 let currentSlide = 0;
 const slider = document.getElementById('reviewSlider');
-const slides = document.querySelectorAll('.slide');
-const totalSlides = slides.length;
-
-function nextSlide() {
-    currentSlide = (currentSlide + 1) % totalSlides;
-    updateSlider();
-}
-
-function updateSlider() {
-    slider.style.transform = `translateX(-${currentSlide * 100}%)`;
-}
-
-// প্রতি ৩ সেকেন্ড (৩০০০ মিলি-সেকেন্ড) পর পর স্লাইড পরিবর্তন
 if(slider) {
-    setInterval(nextSlide, 3000);
+    const slides = slider.querySelectorAll('.slide');
+    setInterval(() => {
+        currentSlide = (currentSlide + 1) % slides.length;
+        slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+    }, 3000);
 }
