@@ -3,61 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <script>
-  async function trackProEvent(eventName, eventData = {}) {
-    if (!eventName) return;
 
-    const eventId = eventData.eventID || 'id_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-    
-    // Browser Side
-    fbq('track', eventName, eventData, { eventID: eventId });
-
-    // Server-Side (CAPI) - এখানে সরাসরি URL এবং ID দিন
-    try {
-      fetch('https://server-side-tracker.vercel.app/api/event', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventName: eventName,
-          eventID: eventId,
-          pixelId: '1194859455939328', 
-          userData: {
-            client_user_agent: navigator.userAgent,
-            fbp: document.cookie.split('; ').find(row => row.startsWith('_fbp='))?.split('=')[1],
-            fbc: new URLSearchParams(window.location.search).get('fbclid')
-          },
-          customData: eventData
-        })
-      });
-    } catch (err) { 
-      console.error('CAPI Error:', err); 
-    }
-  }
-</script>
-
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KRK3T55L');</script>
     <link rel="stylesheet" href="style.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <title>প্রিমিয়াম জাফরানি সেরেলাক | স্বপ্নের হাট বাজার</title>
-
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-TZGQNFPV');</script>
-
-    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1194859455939328&ev=PageView&noscript=1"/></noscript>
 </head>
 <body>
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TZGQNFPV"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRK3T55L"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="top-announcement-bar">
         <div class="container">
-            <p><i class="fas fa-bolt flash-icon"></i> সীমিত সময়ের ধামাকা অফার! প্রিমিয়াম জাফরানি সেরেলাক কিনলেই পাচ্ছেন <strong>২০% নিশ্চিত ছাড়!</strong></p>
+            <p><i class="fas fa-bolt flash-icon"></i> সীমিত সময়ের ধামাকা অফার! প্রিমিয়াম জাফরানি সেরেলাক কিনলেই পাচ্ছেন <strong>২০% নিশ্চিত ছাড়!</strong></p>
         </div>
     </div>
 
