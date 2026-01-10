@@ -12,10 +12,13 @@ window.addEventListener('scroll', function() {
 });
 
 /**
- * ৩. অর্ডার সাবমিশন ও ট্র্যাকিং (Advanced Matching & Parameters)
+ * ৩. অর্ডার সাবমিশন ও ট্র্যাকিং (CAPI + GTM Professional Setup)
  */
 document.getElementById('orderForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
+    
+    // ১. একটি ইউনিক আইডি তৈরি করা (Deduplication এর জন্য)
+    const eventID = 'order-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
     
     // ডাটা সংগ্রহ
     const name = document.getElementById('name').value;
@@ -26,25 +29,23 @@ document.getElementById('orderForm')?.addEventListener('submit', async function(
     // দাম নির্ধারণ
     let price = selectedWeight === '500g' ? 600 : (selectedWeight === '2kg' ? 2240 : 1160);
 
-    // --- Facebook & GTM Advanced Purchase (Data Layer Push) ---
+    // ২. GTM DataLayer Push (Professional Tracking)
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
         'event': 'purchase',
+        'event_id': eventID, 
         'value': price,
         'currency': 'BDT',
         'customer_name': name,
-        'customer_phone': phone, // Advanced Matching ডাটা
+        'customer_phone': phone, 
         'product_name': 'Premium Zafrani Cerelac',
         'weight': selectedWeight,
         'event_day': new Date().toLocaleDateString('en-US', {weekday: 'long'}),
         'event_hour': new Date().getHours() + '-' + (new Date().getHours() + 1),
-        'event_month': new Date().toLocaleDateString('en-US', {month: 'long'}),
-        'traffic_source': document.referrer ? document.referrer : 'direct',
-        'user_role': 'guest',
-        'landing_page': 'Show'
+        'traffic_source': document.referrer ? document.referrer : 'direct'
     });
 
-    // Loading Show
+    // লোডিং দেখানো
     const loading = document.createElement('div');
     loading.id = 'customLoading';
     loading.innerHTML = `<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:flex;justify-content:center;align-items:center;color:#fff;flex-direction:column;font-family:sans-serif;">
@@ -54,22 +55,24 @@ document.getElementById('orderForm')?.addEventListener('submit', async function(
     </div>`;
     document.body.appendChild(loading);
 
-    // Google Sheet Submission
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzjD7vlyYEBDZFmH8JvOE62bZplRDTH5D_tRGfj_fHgFLeaKDtJbIFC3qc5XibMS1hF/exec';
+    // ৩. গুগল শিট ও ফেসবুক CAPI তে ডাটা পাঠানো (আপনার নতুন লিঙ্কটি এখানে বসানো হয়েছে)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbznyR5QuJccIeCNYsQxuFK66Tvk48q1wb4ZNrwPguzKB8KkuHcaWDL00iTZCtKfZqq6/exec';
     
     try {
         const formData = new FormData();
+        formData.append('event_id', eventID); 
         formData.append('name', name);
         formData.append('phone', phone);
         formData.append('address', address);
         formData.append('weight', selectedWeight);
         formData.append('price', price);
+        formData.append('user_agent', navigator.userAgent); 
 
         await fetch(scriptURL, { method: 'POST', body: formData });
         
         document.getElementById('customLoading')?.remove();
         
-        // সুন্দর সাকসেস পপআপ দেখানো
+        // সাকসেস পপআপ দেখানো
         const customerNameSpan = document.getElementById('customerName');
         if(customerNameSpan) customerNameSpan.innerText = name;
         
@@ -89,6 +92,7 @@ window.closeModal = function() {
     document.getElementById('successModal').style.display = 'none';
     window.location.reload(); 
 }
+
 /**
  * ৪. টাইমার লজিক
  */
@@ -108,7 +112,6 @@ function startTimer(totalSeconds) {
         if (--timer < 0) timer = 0;
     }, 1000);
 }
-// ৪ দিন ১৮ ঘণ্টা সেট করা হয়েছে
 startTimer((4 * 24 * 3600) + (18 * 3600));
 
 /**
@@ -133,22 +136,16 @@ if(slides.length > 0) {
 }
 
 /**
- * ৬. GTM Add to Cart (উন্নত প্যারামিটার সহ)
+ * ৬. GTM Add to Cart
  */
-
-// ক) বাটন ক্লিক ইভেন্ট
 document.querySelector('.btn-order-premium')?.addEventListener('click', function() {
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
         'event': 'addToCart',
-        'action': 'button_click',
-        'product_name': 'Premium Zafrani Cerelac',
-        'traffic_source': document.referrer ? document.referrer : 'direct',
-        'user_role': 'guest'
+        'product_name': 'Premium Zafrani Cerelac'
     });
 });
 
-// খ) ওজন সিলেক্ট করলে ইভেন্ট পুশ (ডুপ্লিকেট রোধ ও অ্যাডভান্সড ডাটা)
 let hasAddToCartFired = false; 
 document.querySelectorAll('input[name="weight"]').forEach(radio => {
     radio.addEventListener('change', function() {
@@ -156,16 +153,9 @@ document.querySelectorAll('input[name="weight"]').forEach(radio => {
             window.dataLayer = window.dataLayer || [];
             window.dataLayer.push({
                 'event': 'addToCart',
-                'action': 'weight_selection',
-                'selected_weight': this.value,
-                'product_name': 'Premium Zafrani Cerelac',
-                'event_day': new Date().toLocaleDateString('en-US', {weekday: 'long'}),
-                'event_hour': new Date().getHours() + '-' + (new Date().getHours() + 1),
-                'traffic_source': document.referrer ? document.referrer : 'direct',
-                'user_role': 'guest'
+                'selected_weight': this.value
             });
             hasAddToCartFired = true; 
-            console.log('Advanced AddToCart Data Pushed');
         }
     });
 });
