@@ -1,171 +1,206 @@
-/**
- * ১. ইন্টারফেস অ্যানিমেশন (AOS)
- */
-AOS.init({ duration: 1000, once: true });
-
-// ২. স্ক্রল ও নেভিগেশন লজিক
-window.addEventListener('scroll', function() {
-    const nav = document.getElementById('mainNav');
-    if (nav) {
-        window.scrollY > 50 ? nav.classList.add('scrolled') : nav.classList.remove('scrolled');
-    }
-});
-
-/**
- * ৩. অর্ডার সাবমিশন ও ট্র্যাকিং (Advanced Matching & Parameters)
- */
-document.getElementById('orderForm')?.addEventListener('submit', async function(e) {
-    e.preventDefault();
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    // ডাটা সংগ্রহ
-    const name = document.getElementById('name').value;
-    const phone = document.getElementById('phone').value;
-    const address = document.getElementById('address').value;
-    const selectedWeight = document.querySelector('input[name="weight"]:checked').value;
-    
-    // দাম নির্ধারণ
-    let price = selectedWeight === '500g' ? 600 : (selectedWeight === '2kg' ? 2240 : 1160);
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KRK3T55L');</script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    // --- Facebook & GTM Advanced Purchase (Data Layer Push) ---
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        'event': 'purchase',
-        'value': price,
-        'currency': 'BDT',
-        'customer_name': name,
-        'customer_phone': phone, // Advanced Matching ডাটা
-        'product_name': 'Premium Zafrani Cerelac',
-        'weight': selectedWeight,
-        'event_day': new Date().toLocaleDateString('en-US', {weekday: 'long'}),
-        'event_hour': new Date().getHours() + '-' + (new Date().getHours() + 1),
-        'event_month': new Date().toLocaleDateString('en-US', {month: 'long'}),
-        'traffic_source': document.referrer ? document.referrer : 'direct',
-        'user_role': 'guest',
-        'landing_page': 'Show'
-    });
+    <title>প্রিমিয়াম জাফরানি সেরেলাক | স্বপ্নের হাট বাজার</title>
+</head>
+<body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRK3T55L"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <div class="top-announcement-bar">
+        <div class="container">
+            <p><i class="fas fa-bolt flash-icon"></i> সীমিত সময়ের ধামাকা অফার! প্রিমিয়াম জাফরানি সেরেলাক কিনলেই পাচ্ছেন <strong>২০% নিশ্চিত ছাড়!</strong></p>
+        </div>
+    </div>
 
-    // Loading Show
-    const loading = document.createElement('div');
-    loading.id = 'customLoading';
-    loading.innerHTML = `<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:flex;justify-content:center;align-items:center;color:#fff;flex-direction:column;font-family:sans-serif;">
-        <div style="width:50px;height:50px;border:5px solid #f3f3f3;border-top:5px solid #FF5722;border-radius:50%;animation:spin 1s linear infinite;"></div>
-        <p style="margin-top:20px;font-size:18px;">আপনার অর্ডারটি প্রসেস হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...</p>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
-    </div>`;
-    document.body.appendChild(loading);
+    <header class="navbar" id="mainNav">
+        <div class="container nav-flex">
+            <a href="#" class="logo">স্বপ্নের হাট <span>বাজার</span></a>
+            <nav class="desktop-nav">
+                <a href="#home">হোম</a>
+                <a href="#ingredients">উপাদানসমূহ</a>
+                <a href="#benefits">উপকারিতা</a>
+                <a href="#order" class="nav-cta ripple">অর্ডার করুন</a>
+            </nav>
+        </div>
+    </header>
 
-    // Google Sheet Submission
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzjD7vlyYEBDZFmH8JvOE62bZplRDTH5D_tRGfj_fHgFLeaKDtJbIFC3qc5XibMS1hF/exec';
-    
-    try {
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('phone', phone);
-        formData.append('address', address);
-        formData.append('weight', selectedWeight);
-        formData.append('price', price);
+    <section id="home" class="hero" style="background-color: #064e3b; color: #ffffff; padding: 60px 0; font-family: 'Hind Siliguri', sans-serif;">
+        <div class="container hero-grid" style="display: flex; align-items: center; justify-content: space-between; gap: 40px; max-width: 1200px; margin: 0 auto;">
+            <div class="hero-content" data-aos="fade-right" style="flex: 1;">
+                <span class="badge pulse-badge" style="background: rgba(251, 191, 36, 0.1); color: #fbbf24; padding: 6px 15px; border-radius: 50px; font-size: 14px; margin-bottom: 25px; display: inline-block; border: 1px solid rgba(251, 191, 36, 0.3); font-weight: 500;">
+                    💎 ১০০% পিওর কোয়ালিটি
+                </span>
+                <h1 style="font-size: 45px; line-height: 1.2; margin-bottom: 20px; color: #ffffff; font-weight: 700;">
+                    শিশুর সঠিক পুষ্টিতে <br>
+                    <span class="highlight" style="color: #fbbf24;">প্রিমিয়াম জাফরানি হোমমেইড</span> <br>
+                    সেরেলাক
+                </h1>
+                <p style="font-size: 19px; line-height: 1.6; margin-bottom: 35px; color: #e2e8f0; font-weight: 300; max-width: 500px;">
+                    ২২টি প্রাকৃতিক উপাদানে তৈরি আমাদের এই সেরেলাক আপনার শিশুর সুস্থতা ও মেধা বিকাশে নিশ্চিত সহায়তা করে।
+                </p>
+                <div class="hero-btns">
+                    <a href="#order" class="btn-order-premium" style="background-color: #fbbf24; color: #064e3b; padding: 14px 35px; border-radius: 10px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 12px; transition: 0.3s; box-shadow: 0 10px 20px rgba(251, 191, 36, 0.2);">
+                        অর্ডার করুন <i class="fas fa-shopping-cart"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-img" data-aos="zoom-in" data-aos-delay="200" style="flex: 1; text-align: right;">
+                <img src="https://github.com/shwapnarhutbazaar-oss/Jafrani-Homemade-Cerelac/blob/main/cerelac%20cover%20pic%202.png?raw=true" alt="Premium Cerelac" style="max-width: 100%; height: auto; border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.4); border: 4px solid rgba(255,255,255,0.1);">
+            </div>
+        </div> 
+    </section>
 
-        await fetch(scriptURL, { method: 'POST', body: formData });
-        
-        document.getElementById('customLoading')?.remove();
-        
-        // সুন্দর সাকসেস পপআপ দেখানো
-        const customerNameSpan = document.getElementById('customerName');
-        if(customerNameSpan) customerNameSpan.innerText = name;
-        
-        const successModal = document.getElementById('successModal');
-        if(successModal) successModal.style.display = 'flex';
-        
-        document.getElementById('orderForm')?.reset();
-        
-    } catch (error) {
-        document.getElementById('customLoading')?.remove();
-        alert("দুঃখিত, সার্ভার সমস্যা হচ্ছে। অনুগ্রহ করে আবার চেষ্টা করুন।");
-    }
-});
+    <section id="ingredients" class="ingredients-section">
+        <div class="container">
+            <div class="section-title" style="text-align: center; margin-bottom: 40px;" data-aos="fade-up">
+                <h2 style="font-size: 32px; color: #004D40;">২২টি প্রধান <span class="highlight">উপাদানসমূহ</span></h2>
+                <p>প্রাকৃতিক পুষ্টির এক অনন্য সংমিশ্রণ</p>
+            </div>
+            <div class="ingredients-grid">
+                <div class="ingredient-card" data-aos="fade-up" data-aos-delay="100">
+                    <h3><i class="fas fa-seedling"></i> শস্য ও ডাল:</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> সিদ্ধ চাল, পোলাও চাল, লাল চাল</li>
+                        <li><i class="fas fa-check-circle"></i> গম, ভুট্টা, মুগ ডাল, মসুর ডাল,ডাবলি ডাল</li>
+                         <li><i class="fas fa-check-circle"></i> মাসকলাইয়ের ডাল,ছোলার ডাল</li>
+                    </ul>
+                </div>
+                <div class="ingredient-card" data-aos="fade-up" data-aos-delay="200">
+                    <h3><i class="fas fa-nut-bolt"></i> বাদাম ও বীজ:</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> কাঠ বাদাম, কাজু বাদাম, পেস্তা বাদাম</li>
+                        <li><i class="fas fa-check-circle"></i> আখরোট, চীনাবাদাম</li>
+                    </ul>
+                </div>
+                <div class="ingredient-card" data-aos="fade-up" data-aos-delay="300">
+                    <h3><i class="fas fa-star"></i> বিশেষ উপাদান:</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> খাঁটি জাফরান, খেজুর</li>
+                        <li><i class="fas fa-check-circle"></i> এলাচ,দারুচিনি,তালমিছরি</li>
+                        <li><i class="fas fa-check-circle"></i> তালবিনা(যবের ছাতু),স্বচ্ছ সাবুদানা</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 
-// পপআপ বন্ধ করার ফাংশন
-window.closeModal = function() {
-    document.getElementById('successModal').style.display = 'none';
-    window.location.reload(); 
-}
-/**
- * ৪. টাইমার লজিক
- */
-function startTimer(totalSeconds) {
-    let timer = totalSeconds;
-    setInterval(function () {
-        let days = Math.floor(timer / (3600 * 24));
-        let hours = Math.floor((timer % (3600 * 24)) / 3600);
-        let mins = Math.floor((timer % 3600) / 60);
-        let secs = Math.floor(timer % 60);
+    <section id="benefits" class="mega-offer-area">
+        <div class="container">
+            <div class="offer-wrapper-new" data-aos="flip-up">
+                <div class="offer-left">
+                    <span class="special-tag shimmer">ধামাকা অফার: প্রথম ২০০ জনের জন্য!</span>
+                    <h2>আপনার সোনামণির সুস্বাস্থ্যের জন্য <br> <span class="highlight-text">প্রিমিয়াম জাফরানি সেরেলাক</span> এখন ২০% ছাড়ে!</h2>
+                    <ul class="benefit-list">
+                        <li><i class="fas fa-check-circle"></i> ১০০% ঘরোয়া পরিবেশে তৈরি ও স্বাস্থ্যসম্মত।</li>
+                        <li><i class="fas fa-check-circle"></i> কোনো প্রকার কেমিক্যাল বা প্রিজারভেটিভ নেই।</li>
+                        <li><i class="fas fa-check-circle"></i> ২২টি প্রাকৃতিক উপাদানের এক অনন্য মিশ্রণ।</li>
+                    </ul>
+                    <div class="action-flex-container">
+                        <a href="#order" class="order-btn-flash">অফারটি লুফে নিন!</a>
+                        <div class="timer-card">
+                            <p>অফার শেষ হতে বাকি:</p>
+                            <div id="flash-timer" class="flash-timer">
+                                <div class="timer-box"><span id="days">00</span><small>দিন</small></div>
+                                <div class="timer-sep">:</div>
+                                <div class="timer-box"><span id="hours">00</span><small>ঘণ্টা</small></div>
+                                <div class="timer-sep">:</div>
+                                <div class="timer-box"><span id="mins">00</span><small>মিনিট</small></div>
+                                <div class="timer-sep">:</div>
+                                <div class="timer-box"><span id="secs">00</span><small>সেকেন্ড</small></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="offer-right">
+                    <div class="discount-badge-new"><span class="pct">২০%</span><span class="off">ছাড়</span></div>
+                    <img src="https://raw.githubusercontent.com/shwapnarhutbazaar-oss/Jafrani-Homemade-Cerelac/refs/heads/main/cerelac.png" alt="Premium Cerelac Offer">
+                </div>
+            </div>
+        </div>
+    </section>
 
-        if(document.getElementById('days')) document.getElementById('days').textContent = String(days).padStart(2, '0');
-        if(document.getElementById('hours')) document.getElementById('hours').textContent = String(hours).padStart(2, '0');
-        if(document.getElementById('mins')) document.getElementById('mins').textContent = String(mins).padStart(2, '0');
-        if(document.getElementById('secs')) document.getElementById('secs').textContent = String(secs).padStart(2, '0');
+    <section id="reviews" class="reviews-section" style="padding: 60px 0; background: #fff8f5; overflow: hidden;">
+        <div class="container">
+            <div class="section-title" style="text-align: center; margin-bottom: 40px;" data-aos="fade-up">
+                <h2 style="font-size: 32px; color: #004D40; font-family: 'Hind Siliguri', sans-serif;">সম্মানিত <span class="highlight" style="color: #fbbf24;">গ্রাহকদের ফিডব্যাক</span></h2>
+                <p style="font-family: 'Hind Siliguri', sans-serif;">আমাদের সম্পর্কে মায়েরা যা বলছেন (স্ক্রিনশট)</p>
+            </div>
+            <div class="slider-container" style="max-width: 500px; margin: 0 auto; overflow: hidden; position: relative; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.1);">
+                <div class="review-slider" id="reviewSlider" style="display: flex; transition: transform 0.8s ease-in-out;">
+                    <div class="slide" style="min-width: 100%;"><img src="https://yourimage.link/3" style="width: 100%; display: block;"></div>
+                    <div class="slide" style="min-width: 100%;"><img src="https://yourimage.link/4" style="width: 100%; display: block;"></div>
+                    <div class="slide" style="min-width: 100%;"><img src="https://yourimage.link/3" style="width: 100%; display: block;"></div>
+                    <div class="slide" style="min-width: 100%;"><img src="https://yourimage.link/4" style="width: 100%; display: block;"></div><div class="slide" style="min-width: 100%;"><img src="https://yourimage.link/3" style="width: 100%; display: block;"></div>
+                    <div class="slide" style="min-width: 100%;"><img src="https://yourimage.link/4" style="width: 100%; display: block;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        if (--timer < 0) timer = 0;
-    }, 1000);
-}
-// ৪ দিন ১৮ ঘণ্টা সেট করা হয়েছে
-startTimer((4 * 24 * 3600) + (18 * 3600));
+    <section id="order" class="order-section">
+        <div class="container">
+            <div class="form-card" data-aos="zoom-in-up">
+                <h2 style="text-align: center; margin-bottom: 25px; color: var(--secondary);">অর্ডার নিশ্চিত করতে ফর্মটি পূরণ করুন</h2>
+                <form id="orderForm">
+                    <div class="input-group"><input type="text" id="name" placeholder="আপনার নাম লিখুন" required></div>
+                    <div class="input-group"><input type="tel" id="phone" placeholder="আপনার মোবাইল নম্বর" required></div>
+                    <div class="input-group"><textarea id="address" rows="3" placeholder="আপনার পূর্ণ ঠিকানা" required></textarea></div>
+                    <div class="weight-selection-container">
+                        <p style="margin-bottom: 12px; font-weight: 700; color: #444;">পরিমাণ বা ওজন নির্বাচন করুন:</p>
+                        <div class="weight-grid">
+                            <label class="weight-option">
+                                <input type="radio" name="weight" value="500g">
+                                <div class="weight-card"><span class="weight-title">৫০০ গ্রাম</span><span class="weight-price">৳ ৬০০</span><span class="old-price">৳ ৭৫০</span></div>
+                            </label>
+                            <label class="weight-option">
+                                <input type="radio" name="weight" value="1kg" checked>
+                                <div class="weight-card"><span class="weight-title">১ কেজি</span><span class="weight-price">৳ ১১৬০</span><span class="old-price">৳ ১৪৫০</span></div>
+                            </label>
+                            <label class="weight-option">
+                                <input type="radio" name="weight" value="2kg">
+                                <div class="weight-card"><span class="weight-title">২ কেজি</span><span class="weight-price">৳ ২২৪০</span><span class="old-price">৳ ২৮০০</span></div>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="order-submit-btn ripple">অর্ডার নিশ্চিত করুন</button>
+                </form>
+            </div>
+        </div>
+    </section>
 
-/**
- * ৫. রিভিউ স্লাইডার লজিক
- */
-let currentSlide = 0;
-const slides = document.querySelectorAll('.review-card');
-function showSlide(index) {
-    slides.forEach((slide, i) => {
-        slide.style.display = i === index ? 'block' : 'none';
-    });
-}
-function nextSlide() {
-    if(slides.length > 0) {
-        currentSlide = (currentSlide + 1) % slides.length;
-        showSlide(currentSlide);
-    }
-}
-if(slides.length > 0) {
-    showSlide(0);
-    setInterval(nextSlide, 5000);
-}
+    <a href="https://wa.me/8801307779982?text=আসসালামু আলাইকুম।" class="whatsapp-btn floating" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+        <span class="wa-badge">1</span>
+    </a>
+    <footer><p>&copy; 2026 Shwapnar Hut Bazaar. All Rights Reserved.</p></footer>
 
-/**
- * ৬. GTM Add to Cart (উন্নত প্যারামিটার সহ)
- */
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>অর্ডার সফল হয়েছে!</h2>
+            <p>ধন্যবাদ <span id="customerName" style="font-weight: bold; color: var(--primary);"></span>, আপনার অর্ডারটি আমরা পেয়েছি। আমাদের প্রতিনিধি শীঘ্রই আপনার সাথে যোগাযোগ করবেন।</p>
+            <button onclick="closeModal()" class="modal-close-btn ripple">ঠিক আছে</button>
+        </div>
+    </div>
 
-// ক) বাটন ক্লিক ইভেন্ট
-document.querySelector('.btn-order-premium')?.addEventListener('click', function() {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        'event': 'addToCart',
-        'action': 'button_click',
-        'product_name': 'Premium Zafrani Cerelac',
-        'traffic_source': document.referrer ? document.referrer : 'direct',
-        'user_role': 'guest'
-    });
-});
+    <a href="#order" class="floating-order-btn ripple"><i class="fas fa-cart-arrow-down"></i><span class="order-text-tooltip">অর্ডার করুন</span></a>
 
-// খ) ওজন সিলেক্ট করলে ইভেন্ট পুশ (ডুপ্লিকেট রোধ ও অ্যাডভান্সড ডাটা)
-let hasAddToCartFired = false; 
-document.querySelectorAll('input[name="weight"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-        if(this.checked && !hasAddToCartFired) {
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-                'event': 'addToCart',
-                'action': 'weight_selection',
-                'selected_weight': this.value,
-                'product_name': 'Premium Zafrani Cerelac',
-                'event_day': new Date().toLocaleDateString('en-US', {weekday: 'long'}),
-                'event_hour': new Date().getHours() + '-' + (new Date().getHours() + 1),
-                'traffic_source': document.referrer ? document.referrer : 'direct',
-                'user_role': 'guest'
-            });
-            hasAddToCartFired = true; 
-            console.log('Advanced AddToCart Data Pushed');
-        }
-    });
-});
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script> 
+    <script src="script.js"></script>
+</body>
+</html>
