@@ -56,7 +56,7 @@ document.getElementById('orderForm')?.addEventListener('submit', async function(
     document.body.appendChild(loading);
 
     // ৩. গুগল শিট ও ফেসবুক CAPI তে ডাটা পাঠানো (আপনার নতুন লিঙ্কটি এখানে বসানো হয়েছে)
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzp_8pEICBMPk1fnx6_4HTMzDKB3HCQaLg1qmcl3sz08Y9J0a_XPjmKK6_RQHUbj2ri/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxqOogwZ_PbCn-ddQtzOl65Iwj-urIZ4rRv81b60pSNEagaQ_NUBr98WMhqBGZ09Isr/exec';
     
     try {
         const formData = new FormData();
