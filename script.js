@@ -69,6 +69,12 @@ document.getElementById('orderForm')?.addEventListener('submit', async function(
         formData.append('user_agent', navigator.userAgent); 
 
         await fetch(scriptURL, { method: 'POST', body: formData });
+        // আপনার script.js এর ভেতরে successModal এর আগে এটি যোগ করুন
+fbq('track', 'Purchase', {
+    value: price,
+    currency: 'BDT',
+    content_name: 'Premium Zafrani Cerelac'
+}, { eventID: eventID }); // এই eventID টাই সার্ভারের সাথে মিল করাবে
         
         document.getElementById('customLoading')?.remove();
         
