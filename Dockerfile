@@ -1,4 +1,3 @@
-FROM node:18-slim
+FROM node:18-alpine
 ENV PORT=10000
-EXPOSE 10000
-CMD ["node", "-e", "const http = require('http'); http.createServer((req, res) => { res.writeHead(200); res.end('GTM Server Live'); }).listen(process.env.PORT || 10000);"]
+CMD ["node", "-e", "console.log('Server Live')"]
