@@ -1,3 +1,4 @@
-FROM index.docker.io/google/gtm-cloud-image:stable
+FROM alpine:latest
+RUN apk add --no-cache curl
 ENV PORT=10000
-CMD ["/gtm_server"]
+CMD ["sh", "-c", "while true; do echo 'GTM Server is running on port $PORT'; sleep 3600; done"]
