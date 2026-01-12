@@ -1,3 +1,3 @@
-FROM gcr.io/google-tag-manager/gtm-cloud-image:stable
+FROM gcr.io/cloud-tagging-103020/gtm-cloud-image:latest
 ENV PORT=10000
 CMD ["/gtm_server"]
