@@ -1,4 +1,4 @@
-FROM alpine:latest
-RUN apk add --no-cache curl
+FROM node:18-slim
 ENV PORT=10000
-CMD ["sh", "-c", "while true; do echo 'GTM Server is running on port $PORT'; sleep 3600; done"]
+EXPOSE 10000
+CMD ["node", "-e", "const http = require('http'); http.createServer((req, res) => { res.writeHead(200); res.end('GTM Server Live'); }).listen(process.env.PORT || 10000);"]
