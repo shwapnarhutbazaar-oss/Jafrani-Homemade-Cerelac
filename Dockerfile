@@ -1,5 +1,11 @@
 FROM node:18-alpine
 WORKDIR /app
-RUN echo "const http = require('http'); http.createServer((req, res) => { res.writeHead(200); res.end('GTM Server is Running'); }).listen(process.env.PORT || 10000);" > server.js
-ENV PORT=10000
-CMD ["node", "server.js"]
+
+# ফাইলগুলো কপি এবং ইনস্টল করা
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+# সার্ভার রান করা
+EXPOSE 10000
+CMD ["npm", "start"]
