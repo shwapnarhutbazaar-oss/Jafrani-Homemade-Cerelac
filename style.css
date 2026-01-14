@@ -410,3 +410,159 @@ footer { background: #1a1a1a; color: #fff; text-align: center; padding: 30px 0; 
     margin-top: 20px;
     box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
 }
+/* প্রফেশনাল ফর্ম ডিজাইন */
+.form-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-header h2 {
+    color: var(--secondary);
+    font-size: 26px;
+    margin-bottom: 10px;
+}
+
+.form-header p {
+    color: #666;
+    font-size: 15px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+    font-size: 15px;
+}
+
+.input-group label i {
+    color: var(--primary);
+    margin-right: 8px;
+}
+
+.input-group input, 
+.input-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #f0f0f0;
+    border-radius: 10px;
+    font-family: 'Hind Siliguri', sans-serif;
+    transition: all 0.3s ease;
+    background: #fdfdfd;
+}
+
+.input-group input:focus, 
+.input-group textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(255, 87, 34, 0.1);
+}
+
+.weight-label {
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* অর্ডার বাটনটিকে আরও আকর্ষণীয় করা */
+.order-submit-btn {
+    width: 100%;
+    background: linear-gradient(45deg, var(--primary), #ff7043);
+    color: white;
+    padding: 18px;
+    border: none;
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 20px rgba(255, 87, 34, 0.3);
+    transition: 0.3s;
+}
+
+.order-submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 25px rgba(255, 87, 34, 0.4);
+}
+/* --- Professional Order Summary Box Styling --- */
+#orderSummaryBox {
+    margin: 25px 0;
+    border: 2px solid #004D40;
+    border-radius: 12px;
+    background: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.summary-header {
+    background: #004D40;
+    color: #fff;
+    padding: 12px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.summary-body {
+    padding: 15px 20px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 15px;
+    color: #444;
+}
+
+.bold-text { font-weight: 700; color: #000; }
+.strikethrough { text-decoration: line-through; color: #999; }
+.highlight-red { color: #d32f2f; font-weight: 700; }
+.highlight-green { color: #2e7d32; font-weight: 700; }
+
+.free-tag {
+    background: #e8f5e9;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.summary-divider {
+    height: 1px;
+    background: #eee;
+    margin: 12px 0;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: 800;
+    color: #004D40;
+}
+
+.summary-footer {
+    background: #f9f9f9;
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    border-top: 1px solid #eee;
+}
