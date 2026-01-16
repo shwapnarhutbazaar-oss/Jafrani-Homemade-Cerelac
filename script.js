@@ -172,8 +172,8 @@ window.dataLayer.push({
     'value': 1160 
 });
 
-// ২. AddToCart ইভেন্ট (অর্ডার করুন বাটনে ক্লিক করলে)
-document.querySelectorAll('a[href="#order"], .btn-order-premium, .order-btn-flash').forEach(button => {
+// ২. AddToCart ইভেন্ট (শুধুমাত্র ওজন সিলেক্ট করলে ফায়ার হবে)
+document.querySelectorAll('.weight-option input').forEach(button => {
     button.addEventListener('click', function() {
         window.dataLayer.push({
             'event': 'add_to_cart',
@@ -189,7 +189,7 @@ document.getElementById('name')?.addEventListener('focus', function() {
     window.dataLayer.push({
         'event': 'initiate_checkout'
     });
-}, { once: true }); // এটি শুধু প্রথমবার ক্লিকের সময় ফায়ার হবে
+}, { once: true });
 
 // ৪. Time on Page (৩০ সেকেন্ড থাকলে)
 setTimeout(function() {
