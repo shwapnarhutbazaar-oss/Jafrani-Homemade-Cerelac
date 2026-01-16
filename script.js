@@ -184,15 +184,17 @@ document.querySelectorAll('.weight-option input').forEach(button => {
     });
 });
 
-// ৩. InitiateCheckout ইভেন্ট (নাম, ফোন বা ঠিকানায় ক্লিক করলে ফায়ার হবে)
-const checkoutInputs = ['#name', '#phone', '#address'];
-checkoutInputs.forEach(selector => {
-    document.querySelector(selector)?.addEventListener('focus', function() {
+// ৩. InitiateCheckout ইভেন্ট (নাম, ফোন বা ঠিকানায় ক্লিক করলে)
+const inputFields = document.querySelectorAll('input[name="name"], input[name="phone"], textarea[name="address"], #name, #phone, #address');
+
+inputFields.forEach(field => {
+    field.addEventListener('focus', function() {
         if (!window.initiateCheckoutFired) {
             window.dataLayer.push({
                 'event': 'initiate_checkout'
             });
-            window.initiateCheckoutFired = true; // নিশ্চিত করবে যেন একবারই ফায়ার হয়
+            window.initiateCheckoutFired = true; // শুধু একবার ফায়ার হবে
+            console.log('InitiateCheckout Fired!'); // চেক করার জন্য
         }
     }, { once: true });
 });
