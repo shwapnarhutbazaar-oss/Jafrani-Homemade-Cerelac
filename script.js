@@ -184,12 +184,18 @@ document.querySelectorAll('.weight-option input').forEach(button => {
     });
 });
 
-// ৩. InitiateCheckout ইভেন্ট (যখন কেউ ফর্মে নাম লিখতে শুরু করবে)
-document.getElementById('name')?.addEventListener('focus', function() {
-    window.dataLayer.push({
-        'event': 'initiate_checkout'
-    });
-}, { once: true });
+// ৩. InitiateCheckout ইভেন্ট (নাম, ফোন বা ঠিকানায় ক্লিক করলে ফায়ার হবে)
+const checkoutInputs = ['#name', '#phone', '#address'];
+checkoutInputs.forEach(selector => {
+    document.querySelector(selector)?.addEventListener('focus', function() {
+        if (!window.initiateCheckoutFired) {
+            window.dataLayer.push({
+                'event': 'initiate_checkout'
+            });
+            window.initiateCheckoutFired = true; // নিশ্চিত করবে যেন একবারই ফায়ার হয়
+        }
+    }, { once: true });
+});
 
 // ৪. Time on Page (৩০ সেকেন্ড থাকলে)
 setTimeout(function() {
@@ -198,3 +204,4 @@ setTimeout(function() {
         'minutes': '0.5'
     });
 }, 30000);
+
