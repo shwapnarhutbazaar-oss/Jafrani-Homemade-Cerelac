@@ -163,3 +163,38 @@ document.querySelectorAll('input[name="weight"]').forEach(input => {
 
 // Run once on load to set initial values
 updateOrderSummary();
+// ১. ViewContent ইভেন্ট (পেজ লোড হলে)
+window.dataLayer = window.dataLayer || [];
+window.dataLayer.push({
+    'event': 'view_content',
+    'content_name': 'Premium Jafrani Cerelac',
+    'currency': 'BDT',
+    'value': 1160 
+});
+
+// ২. AddToCart ইভেন্ট (অর্ডার করুন বাটনে ক্লিক করলে)
+document.querySelectorAll('a[href="#order"], .btn-order-premium, .order-btn-flash').forEach(button => {
+    button.addEventListener('click', function() {
+        window.dataLayer.push({
+            'event': 'add_to_cart',
+            'content_name': 'Premium Jafrani Cerelac',
+            'currency': 'BDT',
+            'value': 1160
+        });
+    });
+});
+
+// ৩. InitiateCheckout ইভেন্ট (যখন কেউ ফর্মে নাম লিখতে শুরু করবে)
+document.getElementById('name')?.addEventListener('focus', function() {
+    window.dataLayer.push({
+        'event': 'initiate_checkout'
+    });
+}, { once: true }); // এটি শুধু প্রথমবার ক্লিকের সময় ফায়ার হবে
+
+// ৪. Time on Page (৩০ সেকেন্ড থাকলে)
+setTimeout(function() {
+    window.dataLayer.push({
+        'event': 'time_on_page',
+        'minutes': '0.5'
+    });
+}, 30000);
